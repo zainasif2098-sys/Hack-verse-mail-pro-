@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HACK VERSE | SYSTEM</title>
+    <title>HACK VERSE | RED PROTOCOL</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -15,25 +15,35 @@
             theme: {
                 extend: {
                     fontFamily: {
+                        sans: ['Orbitron', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
-                        display: ['Orbitron', 'sans-serif'],
                     },
                     colors: {
-                        neon: {
-                            green: '#00ff41',
-                            blue: '#00f3ff',
-                            dark: '#050a0f'
+                        red: {
+                            500: '#ef4444',
+                            600: '#dc2626',
+                            900: '#7f1d1d',
+                            glow: '#ff0000'
+                        },
+                        black: {
+                            base: '#000000',
+                            panel: '#0a0a0a'
                         }
                     },
                     animation: {
-                        'glitch': 'glitch 1s linear infinite',
-                        'scan': 'scan 4s linear infinite',
-                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'fade-out': 'fadeOut 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards',
+                        'pulse-red': 'pulseRed 2s infinite',
                     },
                     keyframes: {
-                        scan: {
-                            '0%': { transform: 'translateY(-100%)' },
-                            '100%': { transform: 'translateY(100vh)' }
+                        fadeOut: { to: { opacity: 0, visibility: 'hidden' } },
+                        slideUp: { 
+                            from: { opacity: 0, transform: 'translateY(20px)' }, 
+                            to: { opacity: 1, transform: 'translateY(0)' } 
+                        },
+                        pulseRed: {
+                            '0%, 100%': { boxShadow: '0 0 10px #dc2626' },
+                            '50%': { boxShadow: '0 0 25px #ef4444' }
                         }
                     }
                 }
@@ -43,217 +53,206 @@
 
     <style>
         body {
-            background-color: #000;
-            color: #00ff41;
-            overflow-x: hidden;
+            background-color: #000000;
+            color: #ef4444;
+            -webkit-tap-highlight-color: transparent;
             font-family: 'JetBrains Mono', monospace;
         }
 
-        /* BOOT SCREEN */
-        #boot-screen {
-            position: fixed; inset: 0; z-index: 9999;
-            background: #000;
+        /* RED GLOW BACKGROUNDS */
+        .glow-bg {
+            position: fixed; z-index: -1;
+            filter: blur(120px); opacity: 0.3;
+            pointer-events: none;
+        }
+        .glow-1 { top: -20%; left: -20%; width: 400px; height: 400px; background: #dc2626; }
+        .glow-2 { bottom: -20%; right: -20%; width: 400px; height: 400px; background: #7f1d1d; }
+
+        /* SPLASH SCREEN */
+        #splash-screen {
+            position: fixed; inset: 0; z-index: 100;
+            background: #000000;
             display: flex; flex-direction: column;
             align-items: center; justify-content: center;
         }
 
-        .logo-container {
+        .logo-ring {
             position: relative;
-            width: 150px; height: 150px;
+            width: 120px; height: 120px;
             display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 0 40px rgba(220, 38, 38, 0.2);
             margin-bottom: 30px;
         }
-
-        .logo-img {
-            width: 100%; height: 100%;
-            object-fit: contain;
-            filter: drop-shadow(0 0 10px #00ff41);
-            animation: pulse-logo 2s infinite;
-        }
-
-        /* Fallback if png5 not found */
-        .logo-img:after {
-            content: 'HV';
-            position: absolute; inset: 0;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 3rem; font-weight: bold;
-            border: 2px solid #00ff41;
+        
+        /* Spinner Ring */
+        .logo-ring::before {
+            content: ''; position: absolute; inset: -5px;
             border-radius: 50%;
-            background: #000;
+            border: 2px solid transparent;
+            border-top-color: #ef4444;
+            border-right-color: #7f1d1d;
+            animation: spin 1s linear infinite;
         }
 
-        @keyframes pulse-logo {
-            0%, 100% { filter: drop-shadow(0 0 10px #00ff41); transform: scale(1); }
-            50% { filter: drop-shadow(0 0 25px #00ff41); transform: scale(1.05); }
+        /* GLASS RED PANELS */
+        .glass-panel {
+            background: rgba(10, 10, 10, 0.85);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
         }
 
-        .loading-bar-container {
-            width: 250px; height: 4px;
-            background: #111;
-            border-radius: 2px;
-            overflow: hidden;
-            margin-top: 20px;
-            position: relative;
+        .btn-red {
+            background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: 1px solid #ef4444;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            box-shadow: 0 4px 15px rgba(220, 38, 38, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
         }
+        .btn-red:active { transform: scale(0.96); box-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
 
-        .loading-bar {
-            width: 0%; height: 100%;
-            background: #00ff41;
-            box-shadow: 0 0 10px #00ff41;
-            transition: width 0.2s ease;
+        .btn-glass {
+            background: rgba(20, 0, 0, 0.6);
+            border: 1px solid rgba(220, 38, 38, 0.3);
+            color: #ef4444;
         }
+        .btn-glass:hover { background: rgba(220, 38, 38, 0.1); }
 
-        /* MAIN UI */
-        .cyber-card {
-            background: rgba(5, 10, 15, 0.9);
-            border: 1px solid rgba(0, 255, 65, 0.3);
-            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
-            backdrop-filter: blur(10px);
+        /* DETAIL VIEW */
+        #detail-view {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
+            background: #050505;
         }
-
-        .cyber-btn {
-            background: rgba(0, 255, 65, 0.1);
-            border: 1px solid rgba(0, 255, 65, 0.5);
-            color: #00ff41;
-            transition: all 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .cyber-btn:hover {
-            background: #00ff41;
-            color: #000;
-            box-shadow: 0 0 15px #00ff41;
-        }
-        .cyber-btn:active { transform: scale(0.95); }
-
-        /* SCAN LINE OVERLAY */
-        .scan-overlay {
-            position: fixed; top: 0; left: 0; right: 0; height: 20px;
-            background: linear-gradient(to bottom, transparent, rgba(0, 255, 65, 0.2), transparent);
-            animation: scan 3s linear infinite;
-            pointer-events: none;
-            z-index: 50;
-        }
+        #detail-view.active { transform: translateX(0); }
+        
+        @keyframes spin { 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <div id="boot-screen">
-        <div class="logo-container">
-            <img src="png5.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" class="logo-img" alt="System Logo">
-            
-            <div style="display:none; width:100px; height:100px; border:2px solid #00ff41; border-radius:50%; align-items:center; justify-content:center; box-shadow: 0 0 15px #00ff41;">
-                <span class="material-symbols-rounded" style="font-size: 50px;">fingerprint</span>
-            </div>
-        </div>
+    <div class="glow-bg glow-1"></div>
+    <div class="glow-bg glow-2"></div>
 
-        <div class="font-display text-2xl font-bold tracking-widest text-white mb-2">HACK VERSE</div>
-        <div id="boot-text" class="text-xs text-neon-green font-mono mb-4">> INITIALIZING_PROTOCOLS...</div>
+    <div id="splash-screen">
+        <div class="logo-ring">
+            <img src="png5.png" onerror="this.style.display='none'; document.getElementById('fallback-icon').style.display='block'" class="w-20 h-20 object-contain drop-shadow-[0_0_10px_rgba(239,68,68,0.5)]" alt="HV">
+            <span id="fallback-icon" class="material-symbols-rounded text-5xl text-red-500 hidden">fingerprint</span>
+        </div>
+        <h1 class="text-3xl font-bold tracking-widest text-white font-sans">HACK VERSE</h1>
+        <p class="text-xs text-red-500 font-mono tracking-[0.2em] mt-2">> SYSTEM_INITIALIZING...</p>
         
-        <div class="loading-bar-container">
-            <div id="boot-progress" class="loading-bar"></div>
+        <div class="w-48 h-1 bg-red-900/30 rounded-full mt-8 overflow-hidden">
+            <div class="h-full bg-red-600 w-0 transition-all duration-[2000ms] ease-out shadow-[0_0_10px_#ef4444]" id="splash-bar"></div>
         </div>
     </div>
 
-    <div id="app-interface" class="min-h-screen p-4 flex flex-col opacity-0 transition-opacity duration-1000 hidden">
-        <div class="scan-overlay"></div>
-
-        <header class="flex justify-between items-center mb-8 pt-4">
+    <div id="app-container" class="max-w-md mx-auto min-h-screen p-4 flex flex-col opacity-0">
+        
+        <header class="flex justify-between items-center mb-6 pt-4 border-b border-red-900/30 pb-4">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 border border-neon-green flex items-center justify-center bg-neon-green/10">
-                    <span class="material-symbols-rounded">terminal</span>
+                <div class="w-10 h-10 rounded-sm border border-red-600 bg-red-900/20 flex items-center justify-center">
+                    <span class="material-symbols-rounded text-red-500">terminal</span>
                 </div>
                 <div>
-                    <h1 class="font-display font-bold text-lg text-white">SYSTEM_V1</h1>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></span>
-                        <span class="text-[10px] text-neon-green/70">SECURE_CONN</span>
+                    <h2 class="font-sans font-bold text-lg text-white leading-none tracking-wide">HACK VERSE</h2>
+                    <div class="flex items-center gap-2 mt-1">
+                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                        <span class="text-[10px] text-red-400 font-mono">SECURE_UPLINK</span>
                     </div>
                 </div>
             </div>
-            <div class="border border-neon-green/50 px-3 py-1 text-xs font-mono">
+            <div class="px-3 py-1 border border-red-600/50 bg-black text-xs font-mono text-red-500 rounded-sm">
                 <span id="timer">10:00</span>
             </div>
         </header>
 
-        <div class="cyber-card rounded-lg p-6 mb-6 relative overflow-hidden">
-            <div class="absolute top-0 right-0 p-2 opacity-20">
-                <span class="material-symbols-rounded text-6xl">lock</span>
+        <div class="glass-panel rounded-xl p-6 mb-6 relative overflow-hidden">
+            <div class="flex justify-between items-start mb-2">
+                <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest border border-red-900 px-2 py-0.5">Temp_Identity</span>
+                <span class="material-symbols-rounded text-red-800 text-lg">shield</span>
             </div>
 
-            <div class="mb-2 text-xs text-neon-green/60 uppercase tracking-widest">> TEMP_ID_HASH</div>
-            
-            <div class="mb-6">
-                <div id="loader-spinner" class="hidden flex items-center gap-2 mb-2">
-                    <span class="material-symbols-rounded animate-spin text-sm">sync</span>
-                    <span class="text-xs">GENERATING...</span>
+            <div class="mb-6 relative">
+                <div id="api-loader" class="absolute inset-0 flex items-center gap-2 bg-black/90 z-10 transition-opacity duration-300">
+                    <span class="material-symbols-rounded animate-spin text-red-500">sync</span>
+                    <span class="text-xs text-red-500 font-mono">ENCRYPTING_DATA...</span>
                 </div>
-                
-                <h2 id="email-text" onclick="app.copy()" class="text-xl md:text-2xl font-bold break-all text-white hover:text-neon-blue transition-colors cursor-pointer select-all font-mono leading-tight">
-                    INITIALIZING...
-                </h2>
+
+                <h1 id="email-display" onclick="app.copy()" class="text-xl font-bold break-all text-white font-mono cursor-pointer select-all hover:text-red-400 transition-colors">
+                    ...
+                </h1>
+                <p class="text-[10px] text-red-700 mt-2 font-mono">> TAP_TO_COPY_HASH</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="app.refreshIdentity()" class="cyber-btn py-3 font-bold text-sm flex items-center justify-center gap-2">
-                    <span class="material-symbols-rounded">restart_alt</span> NEW ID
+            <div class="grid grid-cols-2 gap-3">
+                <button onclick="app.refreshIdentity()" class="btn-glass py-3 rounded font-bold text-xs flex items-center justify-center gap-2">
+                    <span class="material-symbols-rounded text-sm">restart_alt</span> RESET
                 </button>
-                <button onclick="app.copy()" class="cyber-btn py-3 font-bold text-sm flex items-center justify-center gap-2 bg-neon-green/20">
-                    <span class="material-symbols-rounded">content_copy</span> COPY
+                <button onclick="app.copy()" class="btn-red py-3 rounded font-bold text-xs flex items-center justify-center gap-2">
+                    <span class="material-symbols-rounded text-sm">content_copy</span> COPY
                 </button>
             </div>
         </div>
 
         <div class="flex-1 flex flex-col">
-            <div class="flex justify-between items-center mb-4 border-b border-neon-green/30 pb-2">
-                <h3 class="font-display font-bold text-white">INBOX_STREAM</h3>
-                <button onclick="app.fetchMessages(true)" id="refresh-icon" class="text-neon-green hover:text-white transition-colors">
+            <div class="flex justify-between items-end mb-4 px-1 border-b border-red-900/30 pb-2">
+                <h3 class="font-sans font-bold text-lg text-white">INBOX_STREAM</h3>
+                <button onclick="app.fetchMessages(true)" id="refresh-btn" class="text-red-700 hover:text-red-500 transition-colors p-1">
                     <span class="material-symbols-rounded">refresh</span>
                 </button>
             </div>
 
-            <div id="inbox-list" class="flex-1 overflow-y-auto space-y-2 pb-20 pr-1">
-                <div class="h-40 flex flex-col items-center justify-center text-neon-green/40 border border-dashed border-neon-green/20 rounded">
-                    <span class="material-symbols-rounded text-4xl mb-2">wifi_tethering_off</span>
-                    <p class="text-xs">NO_PACKETS_RECEIVED</p>
+            <div id="inbox-list" class="flex-1 overflow-y-auto space-y-2 pb-24 pr-1">
+                <div class="py-12 flex flex-col items-center justify-center text-red-900/50">
+                    <span class="material-symbols-rounded text-5xl mb-3">wifi_off</span>
+                    <p class="text-xs font-mono">NO_DATA_PACKETS</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="detail-view" class="fixed inset-0 z-50 bg-black flex flex-col transform translate-x-full transition-transform duration-300">
-        <div class="p-4 border-b border-neon-green/50 flex justify-between items-center bg-neon-dark">
-            <button onclick="app.closeDetail()" class="text-neon-green hover:text-white">
-                <span class="material-symbols-rounded text-3xl">keyboard_arrow_left</span>
+    <div id="detail-view" class="fixed inset-0 z-[60] flex flex-col">
+        <div class="p-4 border-b border-red-900/30 flex items-center justify-between bg-black sticky top-0">
+            <button onclick="app.closeDetail()" class="text-red-500 hover:text-white transition-colors">
+                <span class="material-symbols-rounded text-3xl">chevron_left</span>
             </button>
-            <span class="font-display text-white">MESSAGE_DECRYPTED</span>
-            <button onclick="app.deleteMsg()" class="text-red-500 hover:text-red-400">
-                <span class="material-symbols-rounded">delete</span>
+            <span class="text-xs font-bold text-red-700 font-mono">DECRYPTED_MSG</span>
+            <button onclick="app.deleteMsg()" class="text-red-800 hover:text-red-500 transition-colors">
+                <span class="material-symbols-rounded">delete_forever</span>
             </button>
         </div>
-        
-        <div class="flex-1 overflow-y-auto p-6 bg-black text-neon-green font-mono">
-            <div class="border-b border-neon-green/20 pb-4 mb-4">
-                <h1 id="d-subject" class="text-xl text-white font-bold mb-2">Subject</h1>
-                <div class="flex justify-between text-xs text-neon-green/60">
-                    <span id="d-from">Sender</span>
-                    <span id="d-date">Time</span>
+
+        <div class="flex-1 overflow-y-auto p-6 bg-black font-mono">
+            <h2 id="d-subject" class="text-lg font-bold mb-6 text-white leading-snug font-sans">Subject</h2>
+            
+            <div class="flex items-center gap-4 mb-6 border border-red-900/30 p-4 bg-red-900/10 rounded">
+                <div id="d-avatar" class="w-10 h-10 border border-red-500 flex items-center justify-center font-bold text-white bg-red-900/50">?</div>
+                <div class="overflow-hidden">
+                    <p id="d-from" class="font-bold text-red-400 text-sm truncate">Sender</p>
+                    <p id="d-date" class="text-[10px] text-red-800 mt-1">Time</p>
                 </div>
             </div>
-            <div id="d-body" class="prose prose-invert max-w-none text-sm text-gray-300">
+
+            <div id="d-body" class="prose prose-invert max-w-none text-gray-300 text-xs leading-relaxed border-t border-red-900/20 pt-4">
                 </div>
         </div>
     </div>
 
-    <a href="https://whatsapp.com/channel/0029Vb0FDlJ96H4bfi55nK3c" target="_blank" class="fixed bottom-6 right-6 z-40 group">
-        <div class="absolute inset-0 bg-neon-green blur opacity-20 group-hover:opacity-50 transition-opacity rounded-full"></div>
-        <div class="relative w-14 h-14 bg-black border border-neon-green rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-[0_0_15px_rgba(0,255,65,0.3)]">
-            <svg class="w-6 h-6 fill-neon-green" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.009.575 2.173.894 3.428.895 3.183 0 5.768-2.586 5.768-5.766 0-3.181-2.585-5.767-5.768-5.767zm.6 1.116c2.569 0 4.659 2.09 4.659 4.659 0 2.564-2.095 4.659-4.659 4.659-1.299 0-2.481-.527-3.333-1.385l-1.325.348.356-1.32c-.896-.892-1.458-2.126-1.458-3.483 0-2.564 2.095-4.659 4.659-4.659z"/></svg>
+    <a href="https://whatsapp.com/channel/0029Vb0FDlJ96H4bfi55nK3c" target="_blank" class="fixed bottom-6 right-6 z-50 group">
+        <div class="absolute inset-0 bg-red-600 blur-lg opacity-20 group-hover:opacity-50 transition-opacity rounded-full animate-pulse-red"></div>
+        <div class="relative w-14 h-14 bg-black border border-red-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-[0_0_15px_#dc2626]">
+            <svg class="w-6 h-6 fill-red-500" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.009.575 2.173.894 3.428.895 3.183 0 5.768-2.586 5.768-5.766 0-3.181-2.585-5.767-5.768-5.767zm.6 1.116c2.569 0 4.659 2.09 4.659 4.659 0 2.564-2.095 4.659-4.659 4.659-1.299 0-2.481-.527-3.333-1.385l-1.325.348.356-1.32c-.896-.892-1.458-2.126-1.458-3.483 0-2.564 2.095-4.659 4.659-4.659z"/></svg>
         </div>
     </a>
 
-    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-neon-dark border border-neon-green text-neon-green px-6 py-2 rounded shadow-[0_0_15px_rgba(0,255,65,0.2)] text-xs font-mono tracking-wide transform -translate-y-20 transition-transform duration-300 z-50">
-        > ACTION_COMPLETE
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 bg-black border border-red-500 text-red-500 px-6 py-2 rounded shadow-[0_0_15px_rgba(220,38,38,0.4)] flex items-center gap-2 transform -translate-y-20 transition-all duration-300 z-[70] font-mono text-xs">
+        <span class="material-symbols-rounded text-sm">terminal</span>
+        <span id="toast-msg">Notification</span>
     </div>
 
     <script>
@@ -268,47 +267,29 @@
                 currentId: null
             },
 
-            // --- STARTUP LOGIC ---
             init() {
-                // 1. Play Boot Animation
-                this.runBootSequence();
+                // 1. Mandatory Animation (Safe Mode)
+                const splashBar = document.getElementById('splash-bar');
+                setTimeout(() => splashBar.style.width = '100%', 100);
+
+                setTimeout(() => {
+                    const splash = document.getElementById('splash-screen');
+                    const container = document.getElementById('app-container');
+                    
+                    splash.classList.add('animate-fade-out');
+                    setTimeout(() => splash.style.display = 'none', 500);
+                    
+                    container.classList.add('animate-slide-up');
+                    
+                    // Start API process
+                    this.createAccount();
+                }, 2200); // 2.2s delay for effect
+
+                // Start Clock
+                this.startTimer();
+                setInterval(() => this.fetchMessages(), 5000);
             },
 
-            runBootSequence() {
-                const bar = document.getElementById('boot-progress');
-                const text = document.getElementById('boot-text');
-                const screen = document.getElementById('boot-screen');
-                const main = document.getElementById('app-interface');
-
-                // Simulation of loading steps
-                let w = 0;
-                const int = setInterval(() => {
-                    w += Math.random() * 5;
-                    if(w > 100) w = 100;
-                    bar.style.width = w + '%';
-
-                    if(w > 30 && w < 60) text.innerText = "> ESTABLISHING_UPLINK...";
-                    if(w > 60 && w < 90) text.innerText = "> BYPASSING_FIREWALLS...";
-                    if(w >= 100) {
-                        clearInterval(int);
-                        text.innerText = "> ACCESS_GRANTED";
-                        
-                        // Attempt to connect API while showing 100%
-                        this.createAccount().then(() => {
-                            setTimeout(() => {
-                                screen.style.opacity = '0';
-                                setTimeout(() => {
-                                    screen.style.display = 'none';
-                                    main.classList.remove('hidden');
-                                    setTimeout(() => main.classList.remove('opacity-0'), 100);
-                                }, 500);
-                            }, 500);
-                        });
-                    }
-                }, 50); // Speed of boot bar
-            },
-
-            // --- API LOGIC (Retry Mechanism) ---
             async request(endpoint, method = 'GET', body = null) {
                 try {
                     const headers = { 'Content-Type': 'application/json' };
@@ -318,104 +299,77 @@
                         method, headers, body: body ? JSON.stringify(body) : null
                     });
                     
-                    if (!res.ok) throw new Error('API Fail');
+                    if (!res.ok) throw new Error('API Error');
                     if (method === 'DELETE') return true;
                     return await res.json();
                 } catch (e) {
-                    console.log(e);
+                    console.warn(e);
                     return null;
                 }
             },
 
             async createAccount() {
-                // Show local loader text if main UI is visible
-                document.getElementById('loader-spinner').classList.remove('hidden');
-                
-                // Retry Loop for Domain
-                let domains = null;
-                let attempts = 0;
-                while(!domains && attempts < 3) {
+                const loader = document.getElementById('api-loader');
+                loader.style.opacity = '1';
+
+                // Safe Retry Logic
+                let domains = await this.request('/domains');
+                if(!domains) {
+                    await new Promise(r => setTimeout(r, 1500));
                     domains = await this.request('/domains');
-                    if(!domains) await new Promise(r => setTimeout(r, 1000)); // wait 1s
-                    attempts++;
                 }
 
                 if (!domains || !domains['hydra:member']) {
-                    document.getElementById('email-text').innerText = "CONNECTION_FAILED";
-                    document.getElementById('email-text').style.color = "red";
-                    this.showToast("SERVER_ERROR_RETRYING");
-                    return; // Stop here, user can click retry
+                    document.getElementById('email-display').innerText = "CONNECTION_FAIL";
+                    document.getElementById('email-display').style.color = "#7f1d1d";
+                    this.showToast("SERVER_OFFLINE_RETRYING");
+                    loader.style.opacity = '0';
+                    return;
                 }
 
                 const domain = domains['hydra:member'][0].domain;
-                const user = 'anon' + Math.random().toString(36).substring(5);
-                const password = Math.random().toString(36).substring(2);
+                const user = 'hack' + Math.random().toString(36).substring(5);
+                const pass = Math.random().toString(36).substring(2);
                 const address = `${user}@${domain}`;
 
-                const acc = await this.request('/accounts', 'POST', { address, password });
+                const acc = await this.request('/accounts', 'POST', { address, password: pass });
                 if (acc) {
-                    const tokenData = await this.request('/token', 'POST', { address, password });
+                    const tokenData = await this.request('/token', 'POST', { address, password: pass });
                     if (tokenData) {
                         this.state.token = tokenData.token;
                         this.state.account = acc;
-                        
-                        // Update UI
-                        this.decryptEffect(address); // Hacker text effect
-                        this.startTimer();
-                        this.startPolling();
+                        document.getElementById('email-display').innerText = address;
+                        document.getElementById('email-display').style.color = "white";
+                        this.showToast("IDENTITY_ENCRYPTED");
                     }
                 }
                 
-                document.getElementById('loader-spinner').classList.add('hidden');
-            },
-
-            // --- DECRYPT EFFECT (Matrix Style) ---
-            decryptEffect(target) {
-                const el = document.getElementById('email-text');
-                const chars = "XYZ01_@#";
-                let i = 0;
-                el.style.color = "#00ff41"; // Reset color
-
-                const timer = setInterval(() => {
-                    el.innerText = target.split("").map((c, index) => {
-                        if(index < i) return target[index];
-                        return chars[Math.floor(Math.random() * chars.length)];
-                    }).join("");
-                    
-                    if(i >= target.length) clearInterval(timer);
-                    i += 1/2;
-                }, 30);
+                loader.style.opacity = '0';
+                this.state.timer = 600;
             },
 
             async refreshIdentity() {
-                if(this.state.account) {
-                   await this.request(`/accounts/${this.state.account.id}`, 'DELETE');
-                }
+                if(this.state.account) await this.request(`/accounts/${this.state.account.id}`, 'DELETE');
                 this.state.token = null;
                 this.state.messages = [];
                 document.getElementById('inbox-list').innerHTML = '';
                 this.createAccount();
             },
 
-            // --- POLLING ---
-            startPolling() {
-                setInterval(() => this.fetchMessages(), 5000);
-            },
-
             async fetchMessages(manual = false) {
                 if (!this.state.token) return;
 
                 if(manual) {
-                    const icon = document.getElementById('refresh-icon');
-                    icon.classList.add('animate-spin');
-                    setTimeout(() => icon.classList.remove('animate-spin'), 1000);
+                    const btn = document.getElementById('refresh-btn');
+                    btn.classList.add('animate-spin');
+                    setTimeout(() => btn.classList.remove('animate-spin'), 1000);
                 }
 
                 const data = await this.request('/messages');
                 if (data && data['hydra:member']) {
                     const newMsgs = data['hydra:member'];
                     if(newMsgs.length > this.state.messages.length && !manual) {
-                        this.showToast("> NEW_PACKET_INTERCEPTED");
+                        this.showToast("NEW_PACKET_RECEIVED");
                     }
                     this.state.messages = newMsgs;
                     this.renderInbox();
@@ -426,23 +380,37 @@
                 const list = document.getElementById('inbox-list');
                 if (this.state.messages.length === 0) {
                     list.innerHTML = `
-                        <div class="h-40 flex flex-col items-center justify-center text-neon-green/40 border border-dashed border-neon-green/20 rounded">
-                            <span class="material-symbols-rounded text-4xl mb-2">wifi_tethering_off</span>
-                            <p class="text-xs">NO_PACKETS_RECEIVED</p>
+                        <div class="py-12 flex flex-col items-center justify-center text-red-900/50">
+                            <span class="material-symbols-rounded text-5xl mb-3">wifi_off</span>
+                            <p class="text-xs font-mono">NO_DATA_PACKETS</p>
                         </div>`;
                     return;
                 }
 
                 list.innerHTML = this.state.messages.map(msg => `
-                    <div onclick="app.openMsg('${msg.id}')" class="p-3 bg-neon-green/5 border-l-2 border-neon-green cursor-pointer hover:bg-neon-green/10 transition-colors">
-                        <div class="flex justify-between items-start">
-                            <span class="font-bold text-sm text-white">${msg.from.name || 'Unknown'}</span>
-                            <span class="text-[10px] text-neon-green/60 font-mono">${new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                    <div onclick="app.openMsg('${msg.id}')" class="bg-red-900/10 border-l-2 border-red-600 p-3 mb-2 cursor-pointer hover:bg-red-900/20 transition-colors">
+                        <div class="flex justify-between items-start mb-1">
+                            <h4 class="font-bold text-white text-sm font-sans">${msg.from.name || 'Unknown'}</h4>
+                            <span class="text-[10px] text-red-400 font-mono">${new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
                         </div>
-                        <div class="text-xs text-gray-400 truncate mt-1">${msg.subject}</div>
+                        <p class="text-xs text-gray-400 truncate font-mono">${msg.subject}</p>
                     </div>
                 `).join('');
             },
 
             async openMsg(id) {
-                c
+                const msg = this.state.messages.find(m => m.id === id);
+                if (!msg) return;
+
+                this.state.currentId = id;
+                document.getElementById('detail-view').classList.add('active');
+                
+                document.getElementById('d-subject').innerText = msg.subject;
+                document.getElementById('d-from').innerText = msg.from.address;
+                document.getElementById('d-avatar').innerText = (msg.from.name || 'U')[0].toUpperCase();
+                document.getElementById('d-date').innerText = new Date(msg.createdAt).toLocaleString();
+                document.getElementById('d-body').innerHTML = '<div class="text-center py-10"><span class="material-symbols-rounded animate-spin text-3xl text-red-500">sync</span></div>';
+
+                const full = await this.request(`/messages/${id}`);
+                if (full) {
+             
