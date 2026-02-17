@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HACK VERSE | SYSTEM</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        mono: ['JetBrains Mono', 'monospace'],
+                        display: ['Orbitron', 'sans-serif'],
+                    },
+                    colors: {
+                        neon: {
+                            green: '#00ff41',
+                            blue: '#00f3ff',
+                            dark: '#050a0f'
+                        }
+                    },
+                    animation: {
+                        'glitch': 'glitch 1s linear infinite',
+                        'scan': 'scan 4s linear infinite',
+                        'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100vh)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff41;
+            overflow-x: hidden;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* BOOT SCREEN */
+        #boot-screen {
+            position: fixed; inset: 0; z-index: 9999;
+            background: #000;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+
+        .logo-container {
+            position: relative;
+            width: 150px; height: 150px;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-img {
+            width: 100%; height: 100%;
+            object-fit: contain;
+            filter: drop-shadow(0 0 10px #00ff41);
+            animation: pulse-logo 2s infinite;
+        }
+
+        /* Fallback if png5 not found */
+        .logo-img:after {
+            content: 'HV';
+            position: absolute; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 3rem; font-weight: bold;
+            border: 2px solid #00ff41;
+            border-radius: 50%;
+            background: #000;
+        }
+
+        @keyframes pulse-logo {
+            0%, 100% { filter: drop-shadow(0 0 10px #00ff41); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 25px #00ff41); transform: scale(1.05); }
+        }
+
+        .loading-bar-container {
+            width: 250px; height: 4px;
+            background: #111;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .loading-bar {
+            width: 0%; height: 100%;
+            background: #00ff41;
+            box-shadow: 0 0 10px #00ff41;
+            transition: width 0.2s ease;
+        }
+
+        /* MAIN UI */
+        .cyber-card {
+            background: rgba(5, 10, 15, 0.9);
+            border: 1px solid rgba(0, 255, 65, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .cyber-btn {
+            background: rgba(0, 255, 65, 0.1);
+            border: 1px solid rgba(0, 255, 65, 0.5);
+            color: #00ff41;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cyber-btn:hover {
+            background: #00ff41;
+            color: #000;
+            box-shadow: 0 0 15px #00ff41;
+        }
+        .cyber-btn:active { transform: scale(0.95); }
+
+        /* SCAN LINE OVERLAY */
+        .scan-overlay {
+            position: fixed; top: 0; left: 0; right: 0; height: 20px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 65, 0.2), transparent);
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="boot-screen">
+        <div class="logo-container">
+            <img src="png5.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'" class="logo-img" alt="System Logo">
+            
+            <div style="display:none; width:100px; height:100px; border:2px solid #00ff41; border-radius:50%; align-items:center; justify-content:center; box-shadow: 0 0 15px #00ff41;">
+                <span class="material-symbols-rounded" style="font-size: 50px;">fingerprint</span>
+            </div>
+        </div>
+
+        <div class="font-display text-2xl font-bold tracking-widest text-white mb-2">HACK VERSE</div>
+        <div id="boot-text" class="text-xs text-neon-green font-mono mb-4">> INITIALIZING_PROTOCOLS...</div>
+        
+        <div class="loading-bar-container">
+            <div id="boot-progress" class="loading-bar"></div>
+        </div>
+    </div>
+
+    <div id="app-interface" class="min-h-screen p-4 flex flex-col opacity-0 transition-opacity duration-1000 hidden">
+        <div class="scan-overlay"></div>
+
+        <header class="flex justify-between items-center mb-8 pt-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 border border-neon-green flex items-center justify-center bg-neon-green/10">
+                    <span class="material-symbols-rounded">terminal</span>
+                </div>
+                <div>
+                    <h1 class="font-display font-bold text-lg text-white">SYSTEM_V1</h1>
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 bg-neon-green rounded-full animate-pulse"></span>
+                        <span class="text-[10px] text-neon-green/70">SECURE_CONN</span>
+                    </div>
+                </div>
+            </div>
+            <div class="border border-neon-green/50 px-3 py-1 text-xs font-mono">
+                <span id="timer">10:00</span>
+            </div>
+        </header>
+
+        <div class="cyber-card rounded-lg p-6 mb-6 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-2 opacity-20">
+                <span class="material-symbols-rounded text-6xl">lock</span>
+            </div>
+
+            <div class="mb-2 text-xs text-neon-green/60 uppercase tracking-widest">> TEMP_ID_HASH</div>
+            
+            <div class="mb-6">
+                <div id="loader-spinner" class="hidden flex items-center gap-2 mb-2">
+                    <span class="material-symbols-rounded animate-spin text-sm">sync</span>
+                    <span class="text-xs">GENERATING...</span>
+                </div>
+                
+                <h2 id="email-text" onclick="app.copy()" class="text-xl md:text-2xl font-bold break-all text-white hover:text-neon-blue transition-colors cursor-pointer select-all font-mono leading-tight">
+                    INITIALIZING...
+                </h2>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <button onclick="app.refreshIdentity()" class="cyber-btn py-3 font-bold text-sm flex items-center justify-center gap-2">
+                    <span class="material-symbols-rounded">restart_alt</span> NEW ID
+                </button>
+                <button onclick="app.copy()" class="cyber-btn py-3 font-bold text-sm flex items-center justify-center gap-2 bg-neon-green/20">
+                    <span class="material-symbols-rounded">content_copy</span> COPY
+                </button>
+            </div>
+        </div>
+
+        <div class="flex-1 flex flex-col">
+            <div class="flex justify-between items-center mb-4 border-b border-neon-green/30 pb-2">
+                <h3 class="font-display font-bold text-white">INBOX_STREAM</h3>
+                <button onclick="app.fetchMessages(true)" id="refresh-icon" class="text-neon-green hover:text-white transition-colors">
+                    <span class="material-symbols-rounded">refresh</span>
+                </button>
+            </div>
+
+            <div id="inbox-list" class="flex-1 overflow-y-auto space-y-2 pb-20 pr-1">
+                <div class="h-40 flex flex-col items-center justify-center text-neon-green/40 border border-dashed border-neon-green/20 rounded">
+                    <span class="material-symbols-rounded text-4xl mb-2">wifi_tethering_off</span>
+                    <p class="text-xs">NO_PACKETS_RECEIVED</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="detail-view" class="fixed inset-0 z-50 bg-black flex flex-col transform translate-x-full transition-transform duration-300">
+        <div class="p-4 border-b border-neon-green/50 flex justify-between items-center bg-neon-dark">
+            <button onclick="app.closeDetail()" class="text-neon-green hover:text-white">
+                <span class="material-symbols-rounded text-3xl">keyboard_arrow_left</span>
+            </button>
+            <span class="font-display text-white">MESSAGE_DECRYPTED</span>
+            <button onclick="app.deleteMsg()" class="text-red-500 hover:text-red-400">
+                <span class="material-symbols-rounded">delete</span>
+            </button>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6 bg-black text-neon-green font-mono">
+            <div class="border-b border-neon-green/20 pb-4 mb-4">
+                <h1 id="d-subject" class="text-xl text-white font-bold mb-2">Subject</h1>
+                <div class="flex justify-between text-xs text-neon-green/60">
+                    <span id="d-from">Sender</span>
+                    <span id="d-date">Time</span>
+                </div>
+            </div>
+            <div id="d-body" class="prose prose-invert max-w-none text-sm text-gray-300">
+                </div>
+        </div>
+    </div>
+
+    <a href="https://whatsapp.com/channel/0029Vb0FDlJ96H4bfi55nK3c" target="_blank" class="fixed bottom-6 right-6 z-40 group">
+        <div class="absolute inset-0 bg-neon-green blur opacity-20 group-hover:opacity-50 transition-opacity rounded-full"></div>
+        <div class="relative w-14 h-14 bg-black border border-neon-green rounded-full flex items-center justify-center hover:scale-110 transition-transform shadow-[0_0_15px_rgba(0,255,65,0.3)]">
+            <svg class="w-6 h-6 fill-neon-green" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.009.575 2.173.894 3.428.895 3.183 0 5.768-2.586 5.768-5.766 0-3.181-2.585-5.767-5.768-5.767zm.6 1.116c2.569 0 4.659 2.09 4.659 4.659 0 2.564-2.095 4.659-4.659 4.659-1.299 0-2.481-.527-3.333-1.385l-1.325.348.356-1.32c-.896-.892-1.458-2.126-1.458-3.483 0-2.564 2.095-4.659 4.659-4.659z"/></svg>
+        </div>
+    </a>
+
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 bg-neon-dark border border-neon-green text-neon-green px-6 py-2 rounded shadow-[0_0_15px_rgba(0,255,65,0.2)] text-xs font-mono tracking-wide transform -translate-y-20 transition-transform duration-300 z-50">
+        > ACTION_COMPLETE
+    </div>
+
+    <script>
+        const API = 'https://api.mail.tm';
+
+        const app = {
+            state: {
+                token: null,
+                account: null,
+                timer: 600,
+                messages: [],
+                currentId: null
+            },
+
+            // --- STARTUP LOGIC ---
+            init() {
+                // 1. Play Boot Animation
+                this.runBootSequence();
+            },
+
+            runBootSequence() {
+                const bar = document.getElementById('boot-progress');
+                const text = document.getElementById('boot-text');
+                const screen = document.getElementById('boot-screen');
+                const main = document.getElementById('app-interface');
+
+                // Simulation of loading steps
+                let w = 0;
+                const int = setInterval(() => {
+                    w += Math.random() * 5;
+                    if(w > 100) w = 100;
+                    bar.style.width = w + '%';
+
+                    if(w > 30 && w < 60) text.innerText = "> ESTABLISHING_UPLINK...";
+                    if(w > 60 && w < 90) text.innerText = "> BYPASSING_FIREWALLS...";
+                    if(w >= 100) {
+                        clearInterval(int);
+                        text.innerText = "> ACCESS_GRANTED";
+                        
+                        // Attempt to connect API while showing 100%
+                        this.createAccount().then(() => {
+                            setTimeout(() => {
+                                screen.style.opacity = '0';
+                                setTimeout(() => {
+                                    screen.style.display = 'none';
+                                    main.classList.remove('hidden');
+                                    setTimeout(() => main.classList.remove('opacity-0'), 100);
+                                }, 500);
+                            }, 500);
+                        });
+                    }
+                }, 50); // Speed of boot bar
+            },
+
+            // --- API LOGIC (Retry Mechanism) ---
+            async request(endpoint, method = 'GET', body = null) {
+                try {
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (this.state.token) headers['Authorization'] = `Bearer ${this.state.token}`;
+                    
+                    const res = await fetch(`${API}${endpoint}`, {
+                        method, headers, body: body ? JSON.stringify(body) : null
+                    });
+                    
+                    if (!res.ok) throw new Error('API Fail');
+                    if (method === 'DELETE') return true;
+                    return await res.json();
+                } catch (e) {
+                    console.log(e);
+                    return null;
+                }
+            },
+
+            async createAccount() {
+                // Show local loader text if main UI is visible
+                document.getElementById('loader-spinner').classList.remove('hidden');
+                
+                // Retry Loop for Domain
+                let domains = null;
+                let attempts = 0;
+                while(!domains && attempts < 3) {
+                    domains = await this.request('/domains');
+                    if(!domains) await new Promise(r => setTimeout(r, 1000)); // wait 1s
+                    attempts++;
+                }
+
+                if (!domains || !domains['hydra:member']) {
+                    document.getElementById('email-text').innerText = "CONNECTION_FAILED";
+                    document.getElementById('email-text').style.color = "red";
+                    this.showToast("SERVER_ERROR_RETRYING");
+                    return; // Stop here, user can click retry
+                }
+
+                const domain = domains['hydra:member'][0].domain;
+                const user = 'anon' + Math.random().toString(36).substring(5);
+                const password = Math.random().toString(36).substring(2);
+                const address = `${user}@${domain}`;
+
+                const acc = await this.request('/accounts', 'POST', { address, password });
+                if (acc) {
+                    const tokenData = await this.request('/token', 'POST', { address, password });
+                    if (tokenData) {
+                        this.state.token = tokenData.token;
+                        this.state.account = acc;
+                        
+                        // Update UI
+                        this.decryptEffect(address); // Hacker text effect
+                        this.startTimer();
+                        this.startPolling();
+                    }
+                }
+                
+                document.getElementById('loader-spinner').classList.add('hidden');
+            },
+
+            // --- DECRYPT EFFECT (Matrix Style) ---
+            decryptEffect(target) {
+                const el = document.getElementById('email-text');
+                const chars = "XYZ01_@#";
+                let i = 0;
+                el.style.color = "#00ff41"; // Reset color
+
+                const timer = setInterval(() => {
+                    el.innerText = target.split("").map((c, index) => {
+                        if(index < i) return target[index];
+                        return chars[Math.floor(Math.random() * chars.length)];
+                    }).join("");
+                    
+                    if(i >= target.length) clearInterval(timer);
+                    i += 1/2;
+                }, 30);
+            },
+
+            async refreshIdentity() {
+                if(this.state.account) {
+                   await this.request(`/accounts/${this.state.account.id}`, 'DELETE');
+                }
+                this.state.token = null;
+                this.state.messages = [];
+                document.getElementById('inbox-list').innerHTML = '';
+                this.createAccount();
+            },
+
+            // --- POLLING ---
+            startPolling() {
+                setInterval(() => this.fetchMessages(), 5000);
+            },
+
+            async fetchMessages(manual = false) {
+                if (!this.state.token) return;
+
+                if(manual) {
+                    const icon = document.getElementById('refresh-icon');
+                    icon.classList.add('animate-spin');
+                    setTimeout(() => icon.classList.remove('animate-spin'), 1000);
+                }
+
+                const data = await this.request('/messages');
+                if (data && data['hydra:member']) {
+                    const newMsgs = data['hydra:member'];
+                    if(newMsgs.length > this.state.messages.length && !manual) {
+                        this.showToast("> NEW_PACKET_INTERCEPTED");
+                    }
+                    this.state.messages = newMsgs;
+                    this.renderInbox();
+                }
+            },
+
+            renderInbox() {
+                const list = document.getElementById('inbox-list');
+                if (this.state.messages.length === 0) {
+                    list.innerHTML = `
+                        <div class="h-40 flex flex-col items-center justify-center text-neon-green/40 border border-dashed border-neon-green/20 rounded">
+                            <span class="material-symbols-rounded text-4xl mb-2">wifi_tethering_off</span>
+                            <p class="text-xs">NO_PACKETS_RECEIVED</p>
+                        </div>`;
+                    return;
+                }
+
+                list.innerHTML = this.state.messages.map(msg => `
+                    <div onclick="app.openMsg('${msg.id}')" class="p-3 bg-neon-green/5 border-l-2 border-neon-green cursor-pointer hover:bg-neon-green/10 transition-colors">
+                        <div class="flex justify-between items-start">
+                            <span class="font-bold text-sm text-white">${msg.from.name || 'Unknown'}</span>
+                            <span class="text-[10px] text-neon-green/60 font-mono">${new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                        </div>
+                        <div class="text-xs text-gray-400 truncate mt-1">${msg.subject}</div>
+                    </div>
+                `).join('');
+            },
+
+            async openMsg(id) {
+                c
