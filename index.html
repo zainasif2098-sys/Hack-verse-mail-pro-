@@ -1,356 +1,359 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>HACK VERSE | RED</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR MAIL PRO | Secure Temp Mail</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
-
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Orbitron', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
-                    colors: { red: { 500: '#ef4444', 900: '#7f1d1d' } },
-                    animation: { 'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite' }
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.4s ease-out forwards',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 3s linear infinite',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
                 }
             }
         }
     </script>
 
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,1,0" />
+
     <style>
-        body { background: #000; color: #ef4444; font-family: 'JetBrains Mono', monospace; overflow: hidden; }
+        /* Base Styles */
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        /* FORCE HIDDEN CLASS */
-        .force-hide { display: none !important; opacity: 0 !important; pointer-events: none !important; }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
 
-        /* SPLASH SCREEN */
-        #splash-screen {
-            position: fixed; inset: 0; z-index: 9999;
-            background: #000;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            transition: opacity 0.5s ease;
+        /* Glassmorphism Classes */
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .glass {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
-        .loader-ring {
-            width: 80px; height: 80px;
-            border: 2px solid transparent;
-            border-top-color: #ef4444;
-            border-right-color: #7f1d1d;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .dark .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        /* EMERGENCY BUTTON */
-        #force-enter-btn {
-            margin-top: 30px;
-            padding: 10px 20px;
-            border: 1px solid #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-            color: #ef4444;
-            font-family: 'Orbitron', sans-serif;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 1s;
-            pointer-events: none;
+        /* Slide Animation classes */
+        .slide-panel {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: translateX(100%);
         }
-        #force-enter-btn.visible { opacity: 1; pointer-events: auto; }
+        .slide-panel.active {
+            transform: translateX(0);
+        }
 
-        @keyframes spin { 100% { transform: rotate(360deg); } }
-        
-        /* MAIN UI */
-        .glass-panel {
-            background: rgba(20, 0, 0, 0.8);
-            border: 1px solid rgba(220, 38, 38, 0.3);
-            backdrop-filter: blur(10px);
-        }
+        /* Loader Animation */
+        .loader-bar { transition: width 0.5s ease-out; }
     </style>
 </head>
-<body>
+<body class="bg-slate-100 dark:bg-[#0f172a] text-slate-800 dark:text-slate-100 transition-colors duration-300 min-h-screen relative overflow-hidden">
 
-    <div id="splash-screen">
-        <div class="loader-ring"></div>
-        <h1 class="text-2xl font-bold tracking-widest text-white font-sans">HACK VERSE</h1>
-        <p class="text-xs text-red-500 mt-2 font-mono" id="loading-text">> SYSTEM_BOOT...</p>
-        
-        <button id="force-enter-btn" onclick="app.forceEnter()">[ TAP TO ENTER SYSTEM ]</button>
+    <div class="fixed top-0 left-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
+    <div class="fixed bottom-0 right-0 w-[500px] h-[500px] bg-purple-500/20 rounded-full blur-[100px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
+
+    <div id="splash" class="fixed inset-0 z-[100] bg-slate-100 dark:bg-[#0f172a] flex flex-col items-center justify-center transition-opacity duration-500">
+        <div class="relative flex items-center justify-center mb-8">
+            <div class="absolute inset-0 bg-blue-500/30 rounded-full animate-ping"></div>
+            <div class="relative w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-2xl z-10">
+                <span class="material-symbols-rounded text-white text-5xl">mail_lock</span>
+            </div>
+        </div>
+        <h1 class="text-3xl font-bold tracking-tight mb-2">AR MAIL <span class="text-blue-600 dark:text-blue-400">PRO</span></h1>
+        <p class="text-slate-500 dark:text-slate-400 mb-8 font-medium">Initializing Secure Channels...</p>
+        <div class="w-64 h-1.5 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+            <div id="splash-bar" class="h-full bg-gradient-to-r from-blue-500 to-purple-500 w-0 loader-bar"></div>
+        </div>
     </div>
 
-    <div id="app-container" class="max-w-md mx-auto h-screen flex flex-col p-4 opacity-0 transition-opacity duration-1000">
+    <div id="app-main" class="relative z-10 max-w-lg mx-auto px-4 py-4 h-screen flex flex-col opacity-0 scale-95 transition-all duration-500">
         
-        <header class="flex justify-between items-center mb-6 pt-2 border-b border-red-900/30 pb-4">
+        <header class="flex items-center justify-between mb-6 pt-2">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 border border-red-600 bg-red-900/20 flex items-center justify-center">
-                    <span class="material-symbols-rounded text-red-500">terminal</span>
+                <div class="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <span class="material-symbols-rounded text-white">mail</span>
                 </div>
-                <div>
-                    <h2 class="font-sans font-bold text-lg text-white">HACK VERSE</h2>
-                    <div class="flex items-center gap-2">
-                        <span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-                        <span id="status-text" class="text-[10px] text-red-500">ONLINE</span>
-                    </div>
-                </div>
+                <span class="font-bold text-lg tracking-tight">AR MAIL PRO</span>
             </div>
-            <div class="border border-red-800 px-2 py-1 text-xs text-red-500">
-                <span id="timer">10:00</span>
-            </div>
+            <button onclick="window.app.toggleTheme()" class="w-10 h-10 rounded-full glass flex items-center justify-center hover:scale-105 transition-transform active:scale-95">
+                <span class="material-symbols-rounded" id="theme-icon">light_mode</span>
+            </button>
         </header>
 
-        <div class="glass-panel p-6 rounded-lg mb-6 relative">
-            <div class="absolute top-2 right-2 text-red-900/50">
-                <span class="material-symbols-rounded text-4xl">fingerprint</span>
-            </div>
-            <span class="text-[10px] text-red-400 border border-red-900 px-1 uppercase">ID_Protocol_V9</span>
-            
-            <div class="mt-4 mb-6">
-                <div id="inner-loader" class="flex items-center gap-2 mb-2 hidden">
-                    <span class="material-symbols-rounded animate-spin text-sm text-red-500">sync</span>
-                    <span class="text-xs text-red-400">CONNECTING_SERVER...</span>
+        <div class="glass-card rounded-3xl p-6 mb-5 relative overflow-hidden group">
+            <div class="flex justify-between items-start mb-4">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-widest">Temporary Address</span>
+                <div class="flex items-center gap-1.5 bg-orange-100 dark:bg-orange-500/20 text-orange-600 dark:text-orange-400 px-3 py-1 rounded-full text-xs font-bold">
+                    <span class="material-symbols-rounded text-sm">timer</span>
+                    <span id="timer">10:00</span>
                 </div>
-
-                <h1 id="email-display" onclick="app.copy()" class="text-xl font-bold text-white break-all font-mono cursor-pointer active:scale-95 transition-transform">
-                    INITIALIZING...
-                </h1>
-                <p class="text-[10px] text-red-600 mt-2">> TAP_ADDRESS_TO_COPY</p>
             </div>
 
-            <div class="grid grid-cols-2 gap-3">
-                <button onclick="app.refreshIdentity()" class="border border-red-800 bg-black/50 text-red-500 py-3 text-xs font-bold hover:bg-red-900/20 transition-colors">
-                    // NEW_ID
+            <div class="mb-6 relative">
+                <h2 id="email-display" class="text-2xl font-bold break-all cursor-pointer hover:text-blue-600 transition-colors select-all">Generating...</h2>
+                <div id="copy-msg" class="absolute -bottom-5 left-0 text-xs text-green-500 font-medium opacity-0 transition-opacity">Copied to clipboard!</div>
+            </div>
+
+            <div class="grid grid-cols-4 gap-3">
+                <button onclick="window.app.copyEmail()" class="col-span-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 rounded-xl py-3 font-semibold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <span class="material-symbols-rounded text-sm">content_copy</span> Copy
                 </button>
-                <button onclick="app.copy()" class="bg-red-700 text-white py-3 text-xs font-bold hover:bg-red-600 transition-colors shadow-[0_0_15px_rgba(220,38,38,0.4)]">
-                    // COPY_HASH
+                <button onclick="window.app.toggleQR()" class="col-span-1 glass rounded-xl flex items-center justify-center active:scale-95 transition-transform hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <span class="material-symbols-rounded">qr_code</span>
+                </button>
+                <button onclick="window.app.refreshIdentity()" id="btn-refresh" class="col-span-1 glass rounded-xl flex items-center justify-center active:scale-95 transition-transform hover:bg-slate-200 dark:hover:bg-slate-700">
+                    <span class="material-symbols-rounded">sync</span>
+                </button>
+            </div>
+
+            <div id="qr-view" class="absolute inset-0 z-20 bg-white/95 dark:bg-slate-900/95 backdrop-blur flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+                <img id="qr-img" src="" class="w-40 h-40 rounded-xl shadow-2xl mb-4 bg-white p-2">
+                <p class="text-sm font-medium mb-4">Scan to open</p>
+                <button onclick="window.app.toggleQR()" class="p-2 rounded-full bg-slate-200 dark:bg-slate-800">
+                    <span class="material-symbols-rounded">close</span>
                 </button>
             </div>
         </div>
 
-        <div class="flex-1 flex flex-col border-t border-red-900/30 pt-4">
+        <div class="glass-card rounded-t-3xl flex-1 p-6 flex flex-col shadow-xl overflow-hidden">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="font-sans font-bold text-white">INBOX_LOGS</h3>
-                <button onclick="app.fetchMessages(true)" class="text-red-500 hover:text-white">
+                <div class="flex items-center gap-2">
+                    <h3 class="font-bold text-lg">Inbox</h3>
+                    <span id="badge" class="bg-blue-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">0</span>
+                </div>
+                <button onclick="window.app.fetchMessages(true)" id="btn-reload" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                     <span class="material-symbols-rounded">refresh</span>
                 </button>
             </div>
-            
-            <div id="inbox-list" class="flex-1 overflow-y-auto space-y-2">
-                <div class="text-center mt-10 text-red-900/50">
-                    <span class="material-symbols-rounded text-4xl">wifi_off</span>
-                    <p class="text-xs mt-2">WAITING_FOR_PACKETS</p>
+
+            <div id="msg-list" class="flex-1 overflow-y-auto space-y-3 pb-20">
+                <div class="h-full flex flex-col items-center justify-center text-slate-400 mt-10">
+                    <div class="w-16 h-16 bg-slate-200 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-4 animate-pulse">
+                        <span class="material-symbols-rounded text-3xl">inbox</span>
+                    </div>
+                    <p>Waiting for emails...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="detail-view" class="fixed inset-0 z-50 bg-black flex flex-col transform translate-x-full transition-transform duration-300">
-        <div class="p-4 border-b border-red-900 flex justify-between bg-black">
-            <button onclick="app.closeDetail()" class="text-red-500"><span class="material-symbols-rounded text-3xl">chevron_left</span></button>
-            <span class="text-red-500 font-bold font-mono">DECRYPTED_MSG</span>
-            <button onclick="app.deleteMsg()" class="text-red-800"><span class="material-symbols-rounded">delete</span></button>
-        </div>
-        <div class="p-6 overflow-y-auto text-gray-300 font-mono text-sm">
-            <h2 id="d-subject" class="text-xl text-white font-bold mb-4">Subject</h2>
-            <div class="border-b border-red-900/30 pb-4 mb-4">
-                <p id="d-from" class="text-red-400 text-xs">Sender</p>
-                <p id="d-date" class="text-red-800 text-[10px]">Time</p>
+    <div id="detail-view" class="fixed inset-0 z-40 bg-slate-100 dark:bg-[#0f172a] slide-panel flex flex-col">
+        <div class="glass border-b border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between sticky top-0 z-10">
+            <button onclick="window.app.closeDetail()" class="p-2 -ml-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                <span class="material-symbols-rounded">arrow_back</span>
+            </button>
+            <h3 id="d-subject" class="font-bold text-sm truncate max-w-[200px]">Subject</h3>
+            <div class="flex gap-2">
+                <button onclick="window.app.downloadEmail()" class="p-2 rounded-full hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-500">
+                    <span class="material-symbols-rounded">download</span>
+                </button>
+                <button onclick="window.app.deleteEmail()" class="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 text-red-500">
+                    <span class="material-symbols-rounded">delete</span>
+                </button>
             </div>
-            <div id="d-body" class="prose prose-invert"></div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-4">
+            <div class="flex items-center gap-3 mb-6">
+                <div id="d-avatar" class="w-12 h-12 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-xl">A</div>
+                <div>
+                    <div id="d-from" class="font-bold">Sender</div>
+                    <div id="d-date" class="text-xs text-slate-500">Date</div>
+                </div>
+            </div>
+            <div id="d-body" class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm min-h-[300px] prose dark:prose-invert max-w-none break-words text-sm">
+                Loading...
+            </div>
         </div>
     </div>
 
-    <a href="https://whatsapp.com/channel/0029Vb0FDlJ96H4bfi55nK3c" target="_blank" class="fixed bottom-6 right-6 z-40 group">
-        <div class="absolute inset-0 bg-red-600 blur opacity-30 animate-pulse-fast rounded-full"></div>
-        <div class="relative w-14 h-14 bg-black border border-red-500 rounded-full flex items-center justify-center shadow-[0_0_10px_#ef4444]">
-            <svg class="w-6 h-6 fill-red-500" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.009.575 2.173.894 3.428.895 3.183 0 5.768-2.586 5.768-5.766 0-3.181-2.585-5.767-5.768-5.767zm.6 1.116c2.569 0 4.659 2.09 4.659 4.659 0 2.564-2.095 4.659-4.659 4.659-1.299 0-2.481-.527-3.333-1.385l-1.325.348.356-1.32c-.896-.892-1.458-2.126-1.458-3.483 0-2.564 2.095-4.659 4.659-4.659z"/></svg>
-        </div>
-    </a>
-
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 bg-black border border-red-600 text-red-500 px-4 py-2 text-xs font-mono rounded shadow-lg transform -translate-y-20 transition-transform duration-300 z-[100]">
-        > ALERT: <span id="toast-msg">...</span>
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-2">
+        <span class="text-[10px] font-bold bg-white dark:bg-slate-800 px-2 py-1 rounded shadow animate-bounce">Join our community</span>
+        <a href="https://whatsapp.com/channel/0029Vb0FDlJ96H4bfi55nK3c" target="_blank" class="flex items-center justify-center w-14 h-14 bg-[#25D366] rounded-full shadow-lg hover:scale-110 transition-transform hover:shadow-[#25D366]/50">
+            <svg class="w-8 h-8 text-white fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.711 2.592 2.654-.698c1.009.575 2.173.894 3.428.895 3.183 0 5.768-2.586 5.768-5.766 0-3.181-2.585-5.767-5.768-5.767zm.6 1.116c2.569 0 4.659 2.09 4.659 4.659 0 2.564-2.095 4.659-4.659 4.659-1.299 0-2.481-.527-3.333-1.385l-1.325.348.356-1.32c-.896-.892-1.458-2.126-1.458-3.483 0-2.564 2.095-4.659 4.659-4.659z"/></svg>
+        </a>
     </div>
+
+    <div id="toast-box" class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[60] flex flex-col gap-2 w-max pointer-events-none"></div>
 
     <script>
-        const API = 'https://api.mail.tm';
+        // IIFE to avoid global pollution, exposing only 'app'
+        (function() {
+            const API_URL = 'https://api.mail.tm';
+            
+            const state = {
+                token: localStorage.getItem('tm_token'),
+                account: JSON.parse(localStorage.getItem('tm_account') || 'null'),
+                messages: [],
+                timer: 600,
+                interval: null,
+                poll: null,
+                currentMsg: null
+            };
 
-        const app = {
-            state: { token: null, account: null, timer: 600, messages: [], currentId: null },
+            const dom = {
+                splash: document.getElementById('splash'),
+                bar: document.getElementById('splash-bar'),
+                main: document.getElementById('app-main'),
+                email: document.getElementById('email-display'),
+                timer: document.getElementById('timer'),
+                list: document.getElementById('msg-list'),
+                badge: document.getElementById('badge'),
+                detail: document.getElementById('detail-view')
+            };
 
-            init() {
-                // 1. SAFETY TIMER: If app stuck, show Force Button after 3s
-                setTimeout(() => {
-                    const btn = document.getElementById('force-enter-btn');
-                    const txt = document.getElementById('loading-text');
-                    if(document.getElementById('splash-screen').style.display !== 'none') {
-                        btn.classList.add('visible');
-                        txt.innerText = "> CONNECTION_SLOW. TAP TO BYPASS.";
-                        txt.style.color = "yellow";
-                    }
-                }, 3000);
-
-                // 2. Normal Auto-Start
-                setTimeout(() => {
-                    this.forceEnter();
-                }, 2000);
-            },
-
-            forceEnter() {
-                // Hide Splash
-                const splash = document.getElementById('splash-screen');
-                const main = document.getElementById('app-container');
-                
-                splash.style.opacity = '0';
-                setTimeout(() => splash.style.display = 'none', 500);
-                
-                main.style.opacity = '1';
-                document.body.style.overflow = 'auto'; // Re-enable scroll
-
-                // Start API in Background (Won't block UI)
-                this.createAccount();
-                this.startTimer();
-                setInterval(() => this.fetchMessages(), 5000);
-            },
-
-            // --- API LOGIC ---
-            async request(endpoint, method = 'GET', body = null) {
+            // API Wrapper
+            async function api(endpoint, method = 'GET', body = null) {
+                const headers = { 'Content-Type': 'application/json' };
+                if (state.token) headers['Authorization'] = `Bearer ${state.token}`;
                 try {
-                    const headers = { 'Content-Type': 'application/json' };
-                    if (this.state.token) headers['Authorization'] = `Bearer ${this.state.token}`;
-                    const res = await fetch(`${API}${endpoint}`, { method, headers, body: JSON.stringify(body) });
-                    if (!res.ok) throw new Error('Err');
+                    const res = await fetch(`${API_URL}${endpoint}`, {
+                        method, headers, body: body ? JSON.stringify(body) : null
+                    });
+                    if (!res.ok) throw new Error(res.status);
                     if (method === 'DELETE') return true;
                     return await res.json();
-                } catch (e) { return null; }
-            },
-
-            async createAccount() {
-                const loader = document.getElementById('inner-loader');
-                const status = document.getElementById('status-text');
-                const display = document.getElementById('email-display');
-                
-                loader.classList.remove('hidden');
-                display.style.opacity = '0.5';
-
-                // Robust Retry for Domain
-                let domains = await this.request('/domains');
-                if(!domains) { await new Promise(r => setTimeout(r, 1000)); domains = await this.request('/domains'); }
-
-                if (!domains || !domains['hydra:member']) {
-                    display.innerText = "SERVER_OFFLINE";
-                    display.style.color = "red";
-                    status.innerText = "OFFLINE";
-                    loader.classList.add('hidden');
-                    this.showToast("API Connection Failed");
-                    return;
+                } catch (e) {
+                    console.error(e);
+                    return null;
                 }
-
-                const domain = domains['hydra:member'][0].domain;
-                const user = 'hv' + Math.random().toString(36).substring(6);
-                const pass = Math.random().toString(36).substring(2);
-                const address = `${user}@${domain}`;
-
-                const acc = await this.request('/accounts', 'POST', { address, password: pass });
-                if (acc) {
-                    const tokenData = await this.request('/token', 'POST', { address, password: pass });
-                    if (tokenData) {
-                        this.state.token = tokenData.token;
-                        this.state.account = acc;
-                        display.innerText = address;
-                        display.style.opacity = '1';
-                        display.style.color = "white";
-                        this.showToast("Identity Encrypted");
-                    }
-                }
-                loader.classList.add('hidden');
-                this.state.timer = 600;
-            },
-
-            async refreshIdentity() {
-                if(this.state.account) await this.request(`/accounts/${this.state.account.id}`, 'DELETE');
-                this.state.token = null;
-                this.state.messages = [];
-                document.getElementById('inbox-list').innerHTML = '';
-                this.createAccount();
-            },
-
-            async fetchMessages(manual = false) {
-                if (!this.state.token) return;
-                const data = await this.request('/messages');
-                if (data && data['hydra:member']) {
-                    const newMsgs = data['hydra:member'];
-                    if(newMsgs.length > this.state.messages.length && !manual) this.showToast("Packet Received");
-                    this.state.messages = newMsgs;
-                    this.renderInbox();
-                }
-            },
-
-            renderInbox() {
-                const list = document.getElementById('inbox-list');
-                if (this.state.messages.length === 0) {
-                    list.innerHTML = `<div class="text-center mt-10 text-red-900/50"><span class="material-symbols-rounded text-4xl">wifi_off</span><p class="text-xs mt-2">NO_DATA_PACKETS</p></div>`;
-                    return;
-                }
-                list.innerHTML = this.state.messages.map(msg => `
-                    <div onclick="app.openMsg('${msg.id}')" class="bg-red-900/10 border-l-2 border-red-600 p-3 mb-2 cursor-pointer hover:bg-red-900/20">
-                        <div class="flex justify-between"><span class="font-bold text-white text-xs">${msg.from.name||'Unknown'}</span><span class="text-[10px] text-red-500">${new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span></div>
-                        <div class="text-xs text-gray-400 truncate mt-1">${msg.subject}</div>
-                    </div>`).join('');
-            },
-
-            async openMsg(id) {
-                const msg = this.state.messages.find(m => m.id === id);
-                if (!msg) return;
-                this.state.currentId = id;
-                document.getElementById('detail-view').classList.remove('translate-x-full');
-                document.getElementById('d-subject').innerText = msg.subject;
-                document.getElementById('d-from').innerText = msg.from.address;
-                document.getElementById('d-date').innerText = new Date(msg.createdAt).toLocaleString();
-                document.getElementById('d-body').innerHTML = '<div class="text-center py-10 text-red-500 animate-pulse">DECRYPTING...</div>';
-                const full = await this.request(`/messages/${id}`);
-                if (full) document.getElementById('d-body').innerHTML = full.html || full.text.replace(/\n/g, '<br>');
-            },
-
-            closeDetail() { document.getElementById('detail-view').classList.add('translate-x-full'); },
-            async deleteMsg() {
-                if(!this.state.currentId) return;
-                await this.request(`/messages/${this.state.currentId}`, 'DELETE');
-                this.state.messages = this.state.messages.filter(m => m.id !== this.state.currentId);
-                this.renderInbox();
-                this.closeDetail();
-                this.showToast("Data Purged");
-            },
-
-            startTimer() {
-                setInterval(() => {
-                    this.state.timer--;
-                    if(this.state.timer <= 0) this.refreshIdentity();
-                    const m = Math.floor(this.state.timer / 60).toString().padStart(2, '0');
-                    const s = (this.state.timer % 60).toString().padStart(2, '0');
-                    document.getElementById('timer').innerText = `${m}:${s}`;
-                }, 1000);
-            },
-
-            copy() {
-                const text = document.getElementById('email-display').innerText;
-                if(text.includes('...')) return;
-                const el = document.createElement('textarea'); el.value = text; document.body.appendChild(el); el.select();
-                try { document.execCommand('copy'); this.showToast("Address Copied"); } catch(e){}
-                document.body.removeChild(el);
-            },
-
-            showToast(msg) {
-                const t = document.getElementById('toast');
-                document.getElementById('toast-msg').innerText = msg;
-                t.classList.remove('-translate-y-20');
-                setTimeout(() => t.classList.add('-translate-y-20'), 3000);
             }
-        };
 
-        window.addEventListener('DOMContentLoaded', () => app.init());
-    </script>
-</body>
-</html>
+            // Core Functions
+            const app = {
+                async init() {
+                    // Theme Init
+                    if(localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                        document.documentElement.classList.add('dark');
+                        document.getElementById('theme-icon').innerText = 'dark_mode';
+                    }
+
+                    // Animation
+                    setTimeout(() => dom.bar.style.width = '100%', 100);
+
+                    // Account Logic
+                    if (!state.token || !state.account) {
+                        await this.createAccount();
+                    } else {
+                        dom.email.innerText = state.account.address;
+                        this.updateQR(state.account.address);
+                    }
+
+                    // Start App
+                    setTimeout(() => {
+                        dom.splash.style.opacity = '0';
+                        setTimeout(() => dom.splash.style.display = 'none', 500);
+                        dom.main.classList.remove('opacity-0', 'scale-95');
+                        dom.main.classList.add('opacity-100', 'scale-100');
+                        this.startTimer();
+                        this.fetchMessages();
+                        this.poll = setInterval(() => this.fetchMessages(), 5000);
+                        this.showToast('Secure Connection Established', 'lock');
+                    }, 1500);
+                },
+
+                async createAccount() {
+                    const domains = await api('/domains');
+                    if (!domains || !domains['hydra:member'][0]) return;
+                    
+                    const domain = domains['hydra:member'][0].domain;
+                    const user = 'ar' + Math.random().toString(36).substring(7);
+                    const password = Math.random().toString(36).substring(2);
+                    const address = `${user}@${domain}`;
+
+                    const acc = await api('/accounts', 'POST', { address, password });
+                    if (acc) {
+                        const tokenData = await api('/token', 'POST', { address, password });
+                        if (tokenData) {
+                            state.token = tokenData.token;
+                            state.account = { id: acc.id, address: acc.address, password };
+                            
+                            localStorage.setItem('tm_token', state.token);
+                            localStorage.setItem('tm_account', JSON.stringify(state.account));
+                            
+                            dom.email.innerText = acc.address;
+                            this.updateQR(acc.address);
+                        }
+                    }
+                },
+
+                async fetchMessages(manual = false) {
+                    if (manual) {
+                        const btn = document.getElementById('btn-reload');
+                        btn.classList.add('animate-spin');
+                        setTimeout(() => btn.classList.remove('animate-spin'), 1000);
+                    }
+                    
+                    const data = await api('/messages');
+                    if (data && data['hydra:member']) {
+                        const newMsgs = data['hydra:member'];
+                        if (newMsgs.length > state.messages.length) {
+                            if (!manual && state.messages.length > 0) this.showToast('New Message Received!', 'mail');
+                        }
+                        state.messages = newMsgs;
+                        this.renderInbox();
+                    }
+                },
+
+                renderInbox() {
+                    dom.badge.innerText = state.messages.length;
+                    if (state.messages.length === 0) {
+                        dom.list.innerHTML = `<div class="h-full flex flex-col items-center justify-center text-slate-400 mt-10"><div class="w-16 h-16 bg-slate-200 dark:bg-slate-700/50 rounded-full flex items-center justify-center mb-4"><span class="material-symbols-rounded text-3xl">inbox</span></div><p>Inbox Empty</p></div>`;
+                        return;
+                    }
+                    
+                    dom.list.innerHTML = state.messages.map((msg, i) => `
+                        <div onclick="window.app.openMsg('${msg.id}')" class="glass-card p-4 rounded-xl shadow-sm cursor-pointer flex gap-3 items-center animate-slide-up hover:bg-white/50 dark:hover:bg-slate-700/50 transition-colors" style="animation-delay: ${i * 0.05}s">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 flex items-center justify-center font-bold shrink-0">
+                                ${(msg.from.name || msg.from.address)[0].toUpperCase()}
+                            </div>
+                            <div class="overflow-hidden flex-1">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-sm truncate text-slate-800 dark:text-slate-100">${msg.from.name || msg.from.address}</h4>
+                                    <span class="text-[10px] text-slate-400">${new Date(msg.createdAt).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</span>
+                                </div>
+                                <p class="text-xs text-slate-500 truncate">${msg.subject}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                },
+
+                async openMsg(id) {
+                    const msg = state.messages.find(m => m.id === id);
+                    if (!msg) return;
+                    
+                    state.currentMsg
